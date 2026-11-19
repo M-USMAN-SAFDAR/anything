@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { useStore } from '../store/useStore';
+import { API_URL, getImageUrl } from '../utils/api';
 
 const Services = () => {
   const { t } = useTranslation();
@@ -52,7 +53,13 @@ const Services = () => {
                     <div className="absolute inset-0 bg-neutral-950/30 group-hover:bg-neutral-950/0 transition-colors duration-700 z-10" />
                     <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent z-20 opacity-95" />
                     <img 
-                      src={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${service.image}`} 
+                      src={getImageUrl(service.image)} 
+                      onError={(e) => {
+                        if (API_URL && !e.target.dataset.triedBackend) {
+                          e.target.dataset.triedBackend = 'true';
+                          e.target.src = `${API_URL}${service.image}`;
+                        }
+                      }}
                       alt={service.name} 
                       loading="lazy" 
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[2s] ease-out grayscale contrast-[1.15] brightness-[0.75] group-hover:brightness-[0.9] sepia-[0.2]" 

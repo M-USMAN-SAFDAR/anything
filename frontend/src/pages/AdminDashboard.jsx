@@ -4,6 +4,7 @@ import { useStore } from '../store/useStore';
 import { useNavigate } from 'react-router-dom';
 import { Trash2, Check, X, Search, Calendar, Loader2, Filter } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { API_URL } from '../utils/api';
 
 const AdminDashboard = () => {
   const [bookings, setBookings] = useState([]);
@@ -28,7 +29,8 @@ const AdminDashboard = () => {
     try {
       setIsLoading(true);
       const config = { headers: { Authorization: `Bearer ${user.token}` } };
-      const { data } = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/bookings`, config);
+      const endpoint = API_URL ? `${API_URL}/api/bookings` : '/api/bookings';
+      const { data } = await axios.get(endpoint, config);
       setBookings(data);
     } catch (err) {
       console.error(err);
@@ -53,7 +55,8 @@ const AdminDashboard = () => {
       setBookings(prev => prev.map(b => b._id === id ? { ...b, status } : b));
       
       const config = { headers: { Authorization: `Bearer ${user.token}` } };
-      await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/bookings/${id}/status`, { status }, config);
+      const endpoint = API_URL ? `${API_URL}/api/bookings/${id}/status` : `/api/bookings/${id}/status`;
+      await axios.put(endpoint, { status }, config);
       showToast(`Booking ${status} successfully`);
     } catch (err) {
       console.error(err);
@@ -67,7 +70,8 @@ const AdminDashboard = () => {
       try {
         setBookings(prev => prev.filter(b => b._id !== id));
         const config = { headers: { Authorization: `Bearer ${user.token}` } };
-        await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/bookings/${id}`, config);
+        const endpoint = API_URL ? `${API_URL}/api/bookings/${id}` : `/api/bookings/${id}`;
+        await axios.delete(endpoint, config);
         showToast('Booking deleted');
       } catch (err) {
         console.error(err);

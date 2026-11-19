@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Check, X, Loader2 } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { useStore } from '../store/useStore';
+import { API_URL } from '../utils/api';
 
 const Book = () => {
   const { t } = useTranslation();
@@ -34,7 +35,8 @@ const Book = () => {
         return;
       }
       try {
-        const { data } = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/bookings/busy?date=${formData.date}`);
+        const endpoint = API_URL ? `${API_URL}/api/bookings/busy?date=${formData.date}` : `/api/bookings/busy?date=${formData.date}`;
+        const { data } = await axios.get(endpoint);
         setBusySlots(data);
       } catch (error) {
         console.error('Error fetching busy slots', error);
@@ -108,7 +110,8 @@ const Book = () => {
     try {
       const names = services.filter(s => formData.selectedServices.includes(s._id)).map(s => s.name);
       
-      await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/bookings`, { 
+      const endpoint = API_URL ? `${API_URL}/api/bookings` : '/api/bookings';
+      await axios.post(endpoint, { 
         ...formData, 
         services: formData.selectedServices,
         serviceNames: names

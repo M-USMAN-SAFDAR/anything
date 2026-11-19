@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useStore } from '../store/useStore';
 import { useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
+import { API_URL } from '../utils/api';
 
 const AdminLogin = () => {
   const [email, setEmail] = useState('');
@@ -22,7 +23,8 @@ const AdminLogin = () => {
     e.preventDefault();
     try {
       setIsLoading(true);
-      const { data } = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/login`, { email, password });
+      const endpoint = API_URL ? `${API_URL}/api/auth/login` : '/api/auth/login';
+      const { data } = await axios.post(endpoint, { email, password });
       
       // Clear fields before navigating for security
       setEmail('');
