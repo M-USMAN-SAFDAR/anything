@@ -1,0 +1,97 @@
+import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { Loader2 } from 'lucide-react';
+import { useStore } from '../store/useStore';
+
+const Services = () => {
+  const { t } = useTranslation();
+  const { services, isLoadingServices: isLoading, fetchServices } = useStore();
+  
+  useEffect(() => {
+    fetchServices();
+  }, [fetchServices]);
+
+  return (
+    <div className="min-h-screen pt-40 pb-32 px-6 max-w-[1400px] mx-auto">
+      <div className="text-center mb-12">
+        <h1 className="text-4xl md:text-5xl font-serif text-gold mb-4 tracking-wide drop-shadow-[0_0_15px_rgba(212,175,55,0.3)]">Premium Services</h1>
+        <p className="text-zinc-400 uppercase tracking-[0.3em] text-[10px] md:text-xs font-light">The pinnacle of men's grooming & refinement</p>
+      </div>
+      
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center py-24 space-y-4">
+          <Loader2 className="animate-spin text-gold" size={48} />
+          <span className="text-zinc-500 uppercase tracking-[0.3em] text-[10px]">Loading Services...</span>
+        </div>
+      ) : services.length === 0 ? (
+        <div className="text-center py-24">
+          <div className="text-zinc-700 text-sm uppercase tracking-widest font-light">Service collections are currently unavailable.</div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 relative" style={{ perspective: 2000 }}>
+          {services.map((service, index) => {
+            return (
+              <motion.div 
+                key={service._id} 
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: index * 0.2, ease: "easeOut" }}
+                whileHover={{ 
+                  y: -12, 
+                  rotateX: 3, 
+                  rotateY: -3,
+                  boxShadow: "0 30px 60px -15px rgba(212, 175, 55, 0.2)"
+                }}
+                className="group relative overflow-hidden bg-zinc-900/50 flex flex-col backdrop-blur-md rounded-sm border border-zinc-800/80 hover:border-gold/40 transition-colors duration-500 will-change-transform"
+                style={{ transformStyle: 'preserve-3d' }}
+              >
+                {service.image && (
+                  <div className="w-full h-[220px] overflow-hidden bg-black relative">
+                    <div className="absolute inset-0 bg-neutral-950/30 group-hover:bg-neutral-950/0 transition-colors duration-700 z-10" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent z-20 opacity-95" />
+                    <img 
+                      src={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${service.image}`} 
+                      alt={service.name} 
+                      loading="lazy" 
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[2s] ease-out grayscale contrast-[1.15] brightness-[0.75] group-hover:brightness-[0.9] sepia-[0.2]" 
+                    />
+                  </div>
+                )}
+                
+                <div className="p-6 flex flex-col flex-grow relative z-20 bg-gradient-to-b from-transparent to-zinc-950/95 -mt-12">
+                  <div className="flex justify-between items-end mb-3">
+                    <h3 className="text-2xl font-serif text-white group-hover:text-gold transition-colors duration-500 drop-shadow-md">{service.name}</h3>
+                    <span className="text-gold font-serif text-xl drop-shadow-[0_0_10px_rgba(212,175,55,0.4)] block pb-1">€{service.price}</span>
+                  </div>
+                  
+                  <p className="text-zinc-400 font-light mb-6 text-sm leading-relaxed line-clamp-2">{service.description}</p>
+                  
+                  <div className="mb-10">
+                    <Link 
+                      to={`/book?service=${encodeURIComponent(service.name)}`}
+                      className="inline-block px-8 py-3 bg-white/5 border border-gold/30 text-gold uppercase tracking-[0.2em] text-xs font-bold hover:bg-gold hover:text-zinc-950 transition-all duration-300 rounded-sm"
+                    >
+                      Book Now
+                    </Link>
+                  </div>
+                  
+                  <div className="flex justify-between items-center mt-auto pt-8 border-t border-white/5 group-hover:border-gold/30 transition-colors duration-500">
+                    <span className="text-xs uppercase tracking-[0.25em] text-zinc-500 flex items-center gap-2">
+                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                       {service.duration} Min
+                    </span>
+                    <span className="text-xs uppercase tracking-[0.25em] text-gold/80 border border-gold/20 px-5 py-2.5 bg-gold/5 hover:bg-gold/10 transition-colors">{service.category}</span>
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Services;
